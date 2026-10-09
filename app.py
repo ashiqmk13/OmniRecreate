@@ -16,7 +16,8 @@ def run_recreation_wrapper(
     character_ref,
     voice_engine,
     voice_name,
-    subtitle_style
+    subtitle_style,
+    progress=gr.Progress(track_tqdm=True)
 ):
     """Starts video recreation thread and yields status updates for Gradio UI."""
     sample_video_path = sample_video.name if sample_video else None
@@ -48,15 +49,16 @@ def run_recreation_wrapper(
         remaining = status["time_remaining"]
         logs_text = "\n".join(status["logs"][-15:])
 
+        progress(pct / 100.0, desc=f"[{pct:.1f}%] {current_step}")
+
         progress_md = f"""
 ### ⚙️ Progress: **{pct:.1f}%**
 **Current Action:** `{current_step}`  
 ⏱️ **Elapsed Time:** `{elapsed}` &nbsp;|&nbsp; ⌛ **Time Left (Est.):** `{remaining}`
 """
         yield (
-            gr.update(value=pct / 100.0, visible=True),
-            gr.update(value=progress_md),
-            gr.update(value=logs_text),
+            progress_md,
+            logs_text,
             None # Video output stays None until done
         )
         time.sleep(0.5)
@@ -67,24 +69,23 @@ def run_recreation_wrapper(
     final_output = status.get("output_video_path")
 
     if final_output and os.path.exists(final_output):
+        progress(1.0, desc="Completed!")
         progress_md = f"""
 ### ✅ **Video Creation Complete!**
 ⏱️ **Total Time:** `{status['elapsed_time']}`  
 Output generated with **STRICT NO MUSIC** & **{'Faceless Human Features' if lock_facial_features else 'Unlocked Face Generation'}**.
 """
         yield (
-            gr.update(value=1.0, visible=True),
-            gr.update(value=progress_md),
-            gr.update(value=logs_text),
+            progress_md,
+            logs_text,
             final_output
         )
     else:
         err = status.get("error", "Unknown error")
         progress_md = f"### ❌ Task Failed: {err}"
         yield (
-            gr.update(value=0.0, visible=True),
-            gr.update(value=progress_md),
-            gr.update(value=logs_text),
+            progress_md,
+            logs_text,
             None
         )
 
@@ -132,7 +133,7 @@ body {
 """
 
 def build_ui():
-    with gr.Blocks(title="OmniRecreate AI - Video Studio", css=custom_css, theme=gr.themes.Soft(dark_mode=True)) as demo:
+    with gr.Blocks(title="OmniRecreate AI - Video Studio", css=custom_css, theme=gr.themes.Soft()) as demo:
         gr.Markdown(
             """
             # 🎬 **OmniRecreate AI - Universal Video Studio**
@@ -162,9 +163,8 @@ def build_ui():
                         info="When LOCKED: Generated video humans will NEVER have facial features (faceless mannequin / silhouette style). When UNLOCKED: Allows facial features."
                     )
                     character_ref_input = gr.File(
-                        label="Character Reference Image (Optional)",
-                        file_types=[".jpg", ".png", ".webp"],
-                        info="Ensures all generated humans/silhouettes follow this character design."
+                        label="Character Reference Image (Optional - Keeps human/silhouette style consistent)",
+                        file_types=[".jpg", ".png", ".webp"]
                     )
 
                 gr.Markdown("### ⏱️ 3. Video Output Configuration")
@@ -201,7 +201,6 @@ def build_ui():
             with gr.Column(scale=1, elem_classes=["panel-box"]):
                 gr.Markdown("### 📊 Live Processing Dashboard")
                 
-                progress_bar = gr.Progress(track_tqdm=False)
                 progress_status_md = gr.Markdown("### Ready to generate.")
                 
                 logs_textbox = gr.Textbox(
@@ -231,7 +230,6 @@ def build_ui():
                 subtitle_style_dropdown
             ],
             outputs=[
-                progress_bar,
                 progress_status_md,
                 logs_textbox,
                 video_output_player
