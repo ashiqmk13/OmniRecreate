@@ -1,0 +1,32 @@
+# Core UI & Web Application
+gradio>=4.20.0
+fastapi>=0.110.0
+uvicorn>=0.28.0
+
+# Speech to Text & Audio Transcriber
+faster-whisper>=1.0.0
+openai-whisper>=20231117
+
+# Voice Synthesis (Open Source TTS)
+kokoro>=0.3.1
+edge-tts>=6.1.9
+pyttsx3>=2.90
+
+# Image & Video AI Generation
+torch>=2.2.0
+torchvision>=0.17.0
+torchaudio>=2.2.0
+diffusers>=0.27.0
+transformers>=4.38.0
+accelerate>=0.27.0
+safetensors>=0.4.2
+
+# Image, Computer Vision & Video Processing
+opencv-python>=4.9.0
+pillow>=10.2.0
+numpy>=1.26.0
+
+# General Utilities
+requests>=2.31.0
+tqdm>=4.66.0
+soundfile>=0.12.1
