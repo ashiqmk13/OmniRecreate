@@ -30,8 +30,8 @@
 ### Installation
 ```bash
 # Clone repository
-git clone https://github.com/YOUR_USERNAME/omnirecreate-ai.git
-cd omnirecreate-ai
+git clone https://github.com/ashiqmk13/OmniRecreate.git
+cd OmniRecreate
 
 # Install dependencies
 pip install -r requirements.txt
@@ -52,8 +52,8 @@ Open your browser at `http://localhost:7860`.
 3. Set runtime to **GPU** (T4 / V100 / A100).
 4. Run the launcher cell:
    ```bash
-   !git clone https://github.com/YOUR_USERNAME/omnirecreate-ai.git
-   %cd omnirecreate-ai
+   !git clone https://github.com/ashiqmk13/OmniRecreate.git
+   %cd OmniRecreate
    !python setup_colab.py
    ```
 5. Click the `.gradio.live` link generated in the output to access your private studio!
